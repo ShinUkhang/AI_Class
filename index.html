@@ -111,10 +111,6 @@
             margin-bottom: 12px;
         }
 
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-
         label {
             font-size: 0.85rem;
             color: var(--text-muted);
@@ -133,15 +129,6 @@
             cursor: pointer;
         }
 
-        input[type="number"] {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            width: 100%;
-        }
-
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -157,30 +144,18 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            transition: all 0.2s;
         }
 
-        .btn:hover:not(:disabled) {
-            background-color: #475569;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
+        .btn:hover:not(:disabled) { background-color: #475569; }
         .btn-primary { background-color: var(--accent-blue); }
-        .btn-primary:hover:not(:disabled) { background-color: #2563eb; }
         .btn-success { background-color: var(--accent-green); }
-        .btn-success:hover:not(:disabled) { background-color: #059669; }
         .btn-danger { background-color: var(--accent-pink); }
-        .btn-danger:hover:not(:disabled) { background-color: #db2777; }
 
-        /* 대시보드 스탯 */
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -195,19 +170,10 @@
             text-align: center;
         }
 
-        .stat-lbl {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
+        .stat-lbl { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-val { font-size: 1.1rem; font-weight: 700; font-family: monospace; }
 
-        .stat-val {
-            font-size: 1.1rem;
-            font-weight: 700;
-            font-family: monospace;
-        }
-
-        /* 메인 시각화 화면 영역 */
+        /* 메인 콘텐츠 영역 */
         .content-area {
             flex: 1;
             display: flex;
@@ -231,7 +197,6 @@
             display: block;
         }
 
-        /* 상태 안내 오버레이 */
         .status-banner {
             position: absolute;
             top: 20px;
@@ -244,27 +209,16 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            pointer-events: none;
             z-index: 10;
+            pointer-events: none;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--text-muted);
-        }
-
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--text-muted); }
         .status-dot.forward { background-color: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
         .status-dot.loss { background-color: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber); }
         .status-dot.backward { background-color: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
+        .status-text { font-size: 0.9rem; font-weight: 600; }
 
-        .status-text {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        /* 데이터셋 가이드 오버레이 (하단 패널 높이 220px를 고려해 bottom 값 조정으로 겹침 완화) */
         .dataset-overlay {
             position: absolute;
             bottom: 240px;
@@ -278,30 +232,24 @@
             z-index: 10;
         }
 
-        .dataset-table {
-            border-collapse: collapse;
-            margin-top: 6px;
-        }
+        .dataset-table { border-collapse: collapse; margin-top: 6px; }
+        .dataset-table th, .dataset-table td { padding: 4px 8px; text-align: center; border: 1px solid var(--border-color); }
+        .dataset-table tr.active-row { background-color: rgba(59, 130, 246, 0.25); border: 1px solid var(--accent-blue); }
 
-        .dataset-table th, .dataset-table td {
-            padding: 4px 8px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .dataset-table tr.active-row {
-            background-color: rgba(59, 130, 246, 0.25);
-            border: 1px solid var(--accent-blue);
-        }
-
-        /* 하단 수학 및 수식 로그 패널 */
-        .log-panel {
+        /* 하단 멀티 로그 & 그래프 패널 디자인 분할 */
+        .bottom-panel {
             height: 220px;
             background-color: var(--panel-bg);
             border-top: 1px solid var(--border-color);
             display: flex;
-            flex-direction: column;
             z-index: 11;
+        }
+
+        .log-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
         }
 
         .log-header {
@@ -319,27 +267,45 @@
             flex: 1;
             padding: 15px 20px;
             overflow-y: auto;
-            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 0.85rem;
             line-height: 1.6;
             color: #cbd5e1;
         }
 
-        .log-entry {
-            margin-bottom: 6px;
-            border-left: 3px solid #475569;
-            padding-left: 10px;
-        }
-
+        .log-entry { margin-bottom: 6px; border-left: 3px solid #475569; padding-left: 10px; }
         .log-entry.info { border-color: var(--accent-blue); }
         .log-entry.success { border-color: var(--accent-green); }
         .log-entry.warning { border-color: var(--accent-amber); }
         .log-entry.danger { border-color: var(--accent-pink); }
+        .math-expr { color: #60a5fa; background: rgba(30, 41, 59, 0.6); padding: 2px 6px; border-radius: 4px; }
 
-        .math-expr {
-            color: #60a5fa;
-            background: rgba(30, 41, 59, 0.6);
-            padding: 2px 6px;
+        /* 결정경계 공간 그래프 영역 */
+        .graph-panel {
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(15, 23, 42, 0.3);
+        }
+        .graph-header {
+            background-color: rgba(15, 23, 42, 0.5);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .graph-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        #graphCanvas {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
         }
     </style>
@@ -397,7 +363,7 @@
             <div class="panel-section">
                 <h2>🎯 데이터 가이드 (XOR 문제)</h2>
                 <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-                    입력값 2개가 서로 다를 때 1을 출력하고, 같을 때 0을 출력하는 비선형 분류 문제입니다. 2층 신경망 구조로 해결합니다.
+                    입력값 2개가 서로 다를 때 1을 출력하고, 같을 때 0을 출력하는 비선형 분류 문제입니다. 직선들을 조합해 차원을 곡선처럼 공간 분리합니다.
                 </p>
             </div>
         </div>
@@ -427,20 +393,27 @@
                 </table>
             </div>
 
-            <div class="log-panel">
-                <div class="log-header">
-                    <span>수학적 연산 및 실시간 파라미터 업데이트 로그</span>
-                    <span id="log-step-badge">IDLE</span>
+            <div class="bottom-panel">
+                <div class="log-panel">
+                    <div class="log-header">
+                        <span>수학적 연산 및 실시간 파라미터 업데이트 로그</span>
+                        <span id="log-step-badge">IDLE</span>
+                    </div>
+                    <div class="log-content" id="log-box">
+                        <div class="log-entry info">시뮬레이터가 준비되었습니다. '단계별 이동'을 눌러 연산을 시작해보세요.</div>
+                    </div>
                 </div>
-                <div class="log-content" id="log-box">
-                    <div class="log-entry info">시뮬레이터가 준비되었습니다. '단계별 이동'을 눌러 순전파(Forward Propagation) 연산을 시작해보세요.</div>
+                <div class="graph-panel">
+                    <div class="graph-header">X1-X2 공간 실시간 직선 경계 분리</div>
+                    <div class="graph-body">
+                        <canvas id="graphCanvas" width="170" height="170"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 인공신경망 데이터 및 상태 정의 ---
         const dataset = [
             { inputs: [0, 0], target: 0 },
             { inputs: [0, 1], target: 1 },
@@ -461,13 +434,13 @@
 
         let network = {
             w1: [
-                [0.4, -0.2, 0.5],
-                [-0.3, 0.6, -0.1]
+                [0.5, -0.3, 0.7],
+                [-0.4, 0.8, -0.2]
             ],
-            b1: [0.1, -0.2, 0.1],
+            b1: [0.1, -0.3, 0.2],
             
-            w2: [[0.5], [-0.6], [0.3]],
-            b2: [-0.1],
+            w2: [[0.6], [-0.7], [0.4]],
+            b2: [-0.2],
 
             inputs: [0, 0],
             h_net: [0, 0, 0],
@@ -479,17 +452,15 @@
             delta_h: [0, 0, 0]
         };
 
-        function sigmoid(x) {
-            return 1 / (1 + Math.exp(-x));
-        }
-        function sigmoidDerivative(a) {
-            return a * (1 - a);
-        }
+        function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+        function sigmoidDerivative(a) { return a * (1 - a); }
 
-        // --- 캔버스 그래픽 및 레이아웃 설정 ---
         const canvas = document.getElementById('networkCanvas');
         const ctx = canvas.getContext('2d');
         const wrapper = document.getElementById('canvas-wrapper');
+
+        const graphCanvas = document.getElementById('graphCanvas');
+        const gCtx = graphCanvas.getContext('2d');
 
         let nodes = { inputs: [], hidden: [], output: [] };
         let particles = [];
@@ -503,23 +474,19 @@
         function setupNodePositions() {
             const w = canvas.width;
             const h = canvas.height;
-
             const xInput = w * 0.2;
             const xHidden = w * 0.5;
             const xOutput = w * 0.8;
 
-            // 노드 반지름 크기를 24에서 48로 2배 확대 및 상하 균등 여백 재배치
             nodes.inputs = [
                 { x: xInput, y: h * 0.33, radius: 48, label: 'X1' },
                 { x: xInput, y: h * 0.67, radius: 48, label: 'X2' }
             ];
-
             nodes.hidden = [
                 { x: xHidden, y: h * 0.22, radius: 48, label: 'H1' },
                 { x: xHidden, y: h * 0.50, radius: 48, label: 'H2' },
                 { x: xHidden, y: h * 0.78, radius: 48, label: 'H3' }
             ];
-
             nodes.output = [
                 { x: xOutput, y: h * 0.50, radius: 48, label: 'Out' }
             ];
@@ -538,16 +505,14 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        function clearLog() {
-            logBox.innerHTML = '';
-        }
+        function clearLog() { logBox.innerHTML = ''; }
 
         function createLayerParticles(fromLayer, toLayer, color, direction = 'forward') {
             particles = [];
             let speedMap = { 1: 0.008, 2: 0.02, 3: 0.05 };
             
-            fromLayer.forEach((fromNode, fromIdx) => {
-                toLayer.forEach((toNode, toIdx) => {
+            fromLayer.forEach((fromNode) => {
+                toLayer.forEach((toNode) => {
                     particles.push({
                         fromX: direction === 'forward' ? fromNode.x : toNode.x,
                         fromY: direction === 'forward' ? fromNode.y : toNode.y,
@@ -586,9 +551,6 @@
                 }
 
                 addLog(`[순전파 1단계] 샘플 #${currentSampleIdx+1} 입력값 [${network.inputs.join(', ')}]이 은닉층으로 전달됩니다.`, 'info');
-                addLog(`연산 공식: <span class="math-expr">H_net = X1·W1 + X2·W1 + bias</span>`, 'info');
-                addLog(`은닉 활성화 결과값: H1=${network.h_out[0].toFixed(3)}, H2=${network.h_out[1].toFixed(3)}, H3=${network.h_out[2].toFixed(3)}`, 'info');
-                
                 createLayerParticles(nodes.inputs, nodes.hidden, 'var(--accent-blue)', 'forward');
                 updateStatusBanner('순전파 단계: 데이터가 입력층에서 은닉층 가중치를 지나 이동 중입니다.', 'forward');
 
@@ -599,10 +561,7 @@
                 network.o_net[0] = network.h_out[0] * network.w2[0][0] + network.h_out[1] * network.w2[1][0] + network.h_out[2] * network.w2[2][0] + network.b2[0];
                 network.o_out[0] = sigmoid(network.o_net[0]);
 
-                addLog(`[순전파 2단계] 활성화된 은닉 노드 정보가 출력층으로 전달됩니다.`, 'info');
-                addLog(`출력 노드 연산: <span class="math-expr">Out_net = ∑(H_out · W2) + b2</span> ➔ 시그모이드 통과`, 'info');
-                addLog(`예측 출력값(Out_out): <strong style="color: var(--accent-blue);">${network.o_out[0].toFixed(4)}</strong> (실제 목표값: ${sample.target})`, 'info');
-                
+                addLog(`[순전파 2단계] 예측 출력값(Out_out): <strong style="color: var(--accent-blue);">${network.o_out[0].toFixed(4)}</strong> (정답: ${sample.target})`, 'info');
                 createLayerParticles(nodes.hidden, nodes.output, 'var(--accent-blue)', 'forward');
                 updateStatusBanner('순전파 단계: 은닉층 연산 결과가 최종 출력 노드로 전달됩니다.', 'forward');
 
@@ -615,10 +574,7 @@
                 currentLoss = error;
                 document.getElementById('loss-display').innerText = currentLoss.toFixed(5);
 
-                addLog(`[오차 계산] 출력값과 실제값 정답 데이터를 비교하여 손실을 측정합니다.`, 'warning');
-                addLog(`손실함수(MSE): <span class="math-expr">Loss = 0.5 · (Target - Out)^2</span>`, 'warning');
-                addLog(`계산된 개별 오차값: <strong style="color: var(--accent-amber);">${currentLoss.toFixed(5)}</strong>`, 'warning');
-                
+                addLog(`[오차 계산] 계산된 개별 오차값: <strong style="color: var(--accent-amber);">${currentLoss.toFixed(5)}</strong>`, 'warning');
                 particles = [];
                 updateStatusBanner('오차 계산 단계: 실제 정답과 예측값을 대조해 손실(Loss)을 구합니다.', 'loss');
 
@@ -629,11 +585,9 @@
 
                 network.delta_o[0] = (network.o_out[0] - sample.target) * sigmoidDerivative(network.o_out[0]);
 
-                addLog(`[역전파 1단계] 출력층 미분을 통해 출력 가중치의 수정 방향(Gradient)을 계산합니다.`, 'danger');
-                addLog(`출력층 오차 기울기: <span class="math-expr">∂E/∂Out_net = (Out - Target) · Out·(1-Out)</span> = ${network.delta_o[0].toFixed(4)}`, 'danger');
-                
+                addLog(`[역전파 1단계] 출력층 오차 기울기 계산 = ${network.delta_o[0].toFixed(4)}`, 'danger');
                 createLayerParticles(nodes.hidden, nodes.output, 'var(--accent-pink)', 'backward');
-                updateStatusBanner('역전파 단계: 출력 오차 미분값이 체인 룰(Chain Rule)에 따라 은닉층으로 거꾸로 전달됩니다.', 'backward');
+                updateStatusBanner('역전파 단계: 출력 오차 미분값이 은닉층으로 거꾸로 전달됩니다.', 'backward');
 
             } else if (STATES[currentStateIdx] === 'BACKWARD_OUTPUT') {
                 currentStateIdx = 5;
@@ -644,9 +598,7 @@
                     network.delta_h[j] = error_sum * sigmoidDerivative(network.h_out[j]);
                 }
 
-                addLog(`[역전파 2단계] 미분 연산이 은닉층으로 확장되어 이전 층의 가중치 조정을 준비합니다.`, 'danger');
-                addLog(`은닉층 H1 오차 기울기: <span class="math-expr">δ_h = δ_out · W2_1 · H1·(1-H1)</span> = ${network.delta_h[0].toFixed(4)}`, 'danger');
-                
+                addLog(`[역전파 2단계] 은닉 가중치 조정을 위한 역전파 확장 중`, 'danger');
                 createLayerParticles(nodes.inputs, nodes.hidden, 'var(--accent-pink)', 'backward');
                 updateStatusBanner('역전파 단계: 미분 전파가 은닉층을 지나 입력 연산부까지 전달되며 오차를 나눕니다.', 'backward');
 
@@ -667,9 +619,7 @@
                     network.b1[j] -= lr * network.delta_h[j];
                 }
 
-                addLog(`[파라미터 업데이트] 계산된 오차 미분값을 반영해 네트워크의 가중치를 조정합니다.`, 'success');
-                addLog(`업데이트 공식: <span class="math-expr">W_new = W_old - 학습률(η) · δ · Input</span>`, 'success');
-                addLog(`가중치가 조정되어 다음 학습 시 오차가 감소하게 됩니다.`, 'success');
+                addLog(`[파라미터 업데이트] 계산된 오차 미분값을 반영해 가중치(W)들을 수정했습니다.`, 'success');
 
                 currentSampleIdx++;
                 if (currentSampleIdx >= dataset.length) {
@@ -679,7 +629,7 @@
                 }
 
                 particles = [];
-                updateStatusBanner('파라미터 업데이트 완료! 새로운 가중치가 네트워크 선 가중치 두께 및 수치로 반영됩니다.', 'info');
+                updateStatusBanner('파라미터 업데이트 완료! 선 가중치 수치 및 공간 그래프가 갱신됩니다.', 'info');
             }
         }
 
@@ -690,32 +640,37 @@
             txt.innerText = text;
         }
 
+        // --- 메인 그래픽 루프 ---
         function drawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // 가중치선 그리기 (인덱스별로 출력 위치 다르게 계산하여 절대 안 겹치게 분산 배치)
             nodes.inputs.forEach((inputNode, i) => {
                 nodes.hidden.forEach((hiddenNode, j) => {
                     const weight = network.w1[i][j];
-                    drawConnection(inputNode.x, inputNode.y, hiddenNode.x, hiddenNode.y, weight);
+                    // 가중치 텍스트 표시 지점 분산 비율 계산 (예: 0.23, 0.3, 0.37 등 다르게 지정)
+                    let textRatio = 0.22 + (j * 0.07) + (i * 0.04);
+                    drawConnection(inputNode.x, inputNode.y, hiddenNode.x, hiddenNode.y, weight, textRatio);
                 });
             });
 
             nodes.hidden.forEach((hiddenNode, j) => {
                 nodes.output.forEach((outputNode, k) => {
                     const weight = network.w2[j][k];
-                    drawConnection(hiddenNode.x, hiddenNode.y, outputNode.x, outputNode.y, weight);
+                    let textRatio = 0.35 + (j * 0.12); // 은닉-출력선도 수치 고유 위치 할당
+                    drawConnection(hiddenNode.x, hiddenNode.y, outputNode.x, outputNode.y, weight, textRatio);
                 });
             });
 
+            // 이동 중인 파티클 그리기
             particles.forEach(p => {
                 p.progress += p.speed;
                 if (p.progress > 1) p.progress = 1;
-
                 const currentX = p.fromX + (p.toX - p.fromX) * p.progress;
                 const currentY = p.fromY + (p.toY - p.fromY) * p.progress;
 
                 ctx.beginPath();
-                ctx.arc(currentX, currentY, 8, 0, Math.PI * 2); // 파티클 크기도 미세 조절 (6->8)
+                ctx.arc(currentX, currentY, 8, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = p.color;
@@ -723,15 +678,19 @@
                 ctx.shadowBlur = 0;
             });
 
-            // 각 노드를 출력하면서 결과 폰트 적용
+            // 노드 렌더링 (크기 2배 및 폰트 크기 2배 반영 유지)
             nodes.inputs.forEach((node, i) => drawNode(node, network.inputs[i].toFixed(1), 'var(--accent-blue)'));
             nodes.hidden.forEach((node, j) => drawNode(node, network.h_out[j].toFixed(2), '#64748b'));
             nodes.output.forEach((node, k) => drawNode(node, network.o_out[k].toFixed(3), 'var(--accent-amber)'));
 
+            // 우측 하단 결정 경계 그래프 동시 드로잉
+            drawSpaceGraph();
+
             requestAnimationFrame(drawNetwork);
         }
 
-        function drawConnection(x1, y1, x2, y2, weight) {
+        // 특정 비율(ratio) 위치에 가중치를 출력하여 겹침 차단하는 구조
+        function drawConnection(x1, y1, x2, y2, weight, ratio) {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -741,10 +700,12 @@
             ctx.strokeStyle = weight >= 0 ? `rgba(96, 165, 250, ${0.2 + absWeight*0.5})` : `rgba(244, 114, 182, ${0.2 + absWeight*0.5})`;
             ctx.stroke();
 
-            // 가중치 폰트 크기 대략 2배 확대 (10px -> 18px)
+            // 계산된 고유 좌표에 18px 크기로 텍스트 렌더링
             ctx.font = '18px Courier New';
             ctx.fillStyle = varColor('--text-muted');
-            ctx.fillText(weight.toFixed(2), (x1 + x2) / 2, (y1 + y2) / 2 - 8);
+            let textX = x1 + (x2 - x1) * ratio;
+            let textY = y1 + (y2 - y1) * ratio - 10;
+            ctx.fillText(weight.toFixed(2), textX, textY);
         }
 
         function drawNode(node, valText, accentColor) {
@@ -752,21 +713,98 @@
             ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
             ctx.fillStyle = 'var(--panel-bg)';
             ctx.strokeStyle = accentColor;
-            ctx.lineWidth = 5; // 두께감도 미세 확장
+            ctx.lineWidth = 5;
             ctx.fill();
             ctx.stroke();
 
             ctx.textAlign = 'center';
-            
-            // 노드 ID 텍스트 크기 2배 확대 (11px -> 22px)
             ctx.font = 'bold 22px Pretendard';
             ctx.fillStyle = 'white';
             ctx.fillText(node.label, node.x, node.y - 8);
 
-            // 노드 내부 변수값 텍스트 크기 2배 확대 (10px -> 20px)
             ctx.font = '20px monospace';
             ctx.fillStyle = varColor('--text-muted');
             ctx.fillText(valText, node.x, node.y + 16);
+        }
+
+        // --- 결정 경계 공간 (직선 분리) 그래프 시각화 함수 ---
+        function drawSpaceGraph() {
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            gCtx.clearRect(0, 0, w, h);
+
+            // 여백용 패딩 설정
+            const p = 25;
+            const gW = w - 2 * p;
+            const gH = h - 2 * p;
+
+            // 1. 축 그리기
+            gCtx.strokeStyle = '#334155';
+            gCtx.lineWidth = 1;
+            gCtx.beginPath();
+            gCtx.moveTo(p, h - p); gCtx.lineTo(w - p, h - p);
+            gCtx.moveTo(p, p); gCtx.lineTo(p, h - p);
+            gCtx.stroke();
+
+            // 축 라벨
+            gCtx.fillStyle = '#64748b';
+            gCtx.font = '9px monospace';
+            gCtx.fillText("0", p - 8, h - p + 8);
+            gCtx.fillText("1", w - p, h - p + 12);
+            gCtx.fillText("1", p - 10, p + 5);
+
+            // 2. 은닉층 뉴런 3개가 구성하는 선형 방정식(직선) 실시간 가시화
+            // 공식: w1*x1 + w2*x2 + b = 0  =>  x2 = (-w1*x1 - b) / w2
+            const colors = ['#3b82f6', '#ec4899', '#10b981']; // H1, H2, H3 고유색상
+            for (let j = 0; j < 3; j++) {
+                let w1 = network.w1[0][j];
+                let w2 = network.w1[1][j];
+                let b = network.b1[j];
+
+                gCtx.strokeStyle = colors[j];
+                gCtx.lineWidth = 1.5;
+                gCtx.beginPath();
+
+                let first = true;
+                // X1 좌표축을 따라 움직이며 매핑 직선 계산
+                for (let xVal = 0; xVal <= 1.0; xVal += 0.1) {
+                    let yVal = 0;
+                    if (Math.abs(w2) > 0.0001) {
+                        yVal = (-w1 * xVal - b) / w2;
+                    } else {
+                        yVal = 0;
+                    }
+
+                    // 좌표 변환 (Canvas 스크린 공간으로 투영)
+                    let scrX = p + xVal * gW;
+                    let scrY = h - p - yVal * gH;
+
+                    // 그래프 내부 가두기 경계처리
+                    if (scrY >= p && scrY <= h - p) {
+                        if (first) { gCtx.moveTo(scrX, scrY); first = false; }
+                        else { gCtx.lineTo(scrX, scrY); }
+                    }
+                }
+                gCtx.stroke();
+            }
+
+            // 3. 네 가지 XOR 샘플 데이터를 좌표에 점으로 표기
+            dataset.forEach((d, idx) => {
+                let scrX = p + d.inputs[0] * gW;
+                let scrY = h - p - d.inputs[1] * gH;
+
+                gCtx.beginPath();
+                gCtx.arc(scrX, scrY, idx === currentSampleIdx ? 7 : 5, 0, Math.PI * 2);
+                
+                // 타겟 정답에 따른 구별 (0은 분홍, 1은 파랑)
+                gCtx.fillStyle = d.target === 1 ? 'var(--accent-blue)' : 'var(--accent-pink)';
+                if (idx === currentSampleIdx) {
+                    gCtx.strokeStyle = '#ffffff';
+                    gCtx.lineWidth = 2;
+                    gCtx.stroke();
+                }
+                gCtx.fill();
+            });
         }
 
         function varColor(varName) {
@@ -780,12 +818,8 @@
             isAutoPlaying = true;
             document.getElementById('btn-auto').innerText = "⏸️ 일시 정지";
             document.getElementById('btn-auto').className = "btn btn-danger";
-            
             let intervalTime = animationSpeed === 1 ? 2500 : animationSpeed === 2 ? 1200 : 400;
-
-            autoPlayInterval = setInterval(() => {
-                nextStep();
-            }, intervalTime);
+            autoPlayInterval = setInterval(() => { nextStep(); }, intervalTime);
         }
 
         function stopAutoPlay() {
@@ -796,30 +830,16 @@
             clearInterval(autoPlayInterval);
         }
 
-        document.getElementById('btn-step').addEventListener('click', () => {
-            stopAutoPlay();
-            nextStep();
-        });
-
-        document.getElementById('btn-auto').addEventListener('click', () => {
-            if (isAutoPlaying) {
-                stopAutoPlay();
-            } else {
-                startAutoPlay();
-            }
-        });
+        document.getElementById('btn-step').addEventListener('click', () => { stopAutoPlay(); nextStep(); });
+        document.getElementById('btn-auto').addEventListener('click', () => { if (isAutoPlaying) { stopAutoPlay(); } else { startAutoPlay(); } });
 
         document.getElementById('btn-reset').addEventListener('click', () => {
             stopAutoPlay();
-            epoch = 0;
-            currentSampleIdx = 0;
-            currentStateIdx = 0;
-            currentLoss = 0.0;
+            epoch = 0; currentSampleIdx = 0; currentStateIdx = 0; currentLoss = 0.0;
             document.getElementById('epoch-display').innerText = "0 / " + maxEpoch;
             document.getElementById('loss-display').innerText = "0.0000";
-            particles = [];
-            clearLog();
-            addLog("🔄 시뮬레이션 인터페이스 및 신경망 가중치 상태가 초기화되었습니다.", "warning");
+            particles = []; clearLog();
+            addLog("🔄 시뮬레이션 상태 및 가중치가 초기화되었습니다.", "warning");
             updateStatusBanner('대기 중 (단계별 이동이나 자동 학습을 시작하세요)', 'info');
         });
 
@@ -838,11 +858,7 @@
             animationSpeed = parseInt(e.target.value);
             const textMap = { 1: "느림", 2: "보통", 3: "빠름" };
             document.getElementById('speed-val').innerText = textMap[animationSpeed];
-            
-            if (isAutoPlaying) {
-                stopAutoPlay();
-                startAutoPlay();
-            }
+            if (isAutoPlaying) { stopAutoPlay(); startAutoPlay(); }
         });
 
         resizeCanvas();
