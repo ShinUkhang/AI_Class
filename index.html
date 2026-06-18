@@ -264,10 +264,10 @@
             font-weight: 600;
         }
 
-        /* 데이터셋 가이드 오버레이 */
+        /* 데이터셋 가이드 오버레이 (하단 패널 높이 220px를 고려해 bottom 값 조정으로 겹침 완화) */
         .dataset-overlay {
             position: absolute;
-            bottom: 20px;
+            bottom: 240px;
             left: 20px;
             background-color: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(8px);
@@ -301,6 +301,7 @@
             border-top: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            z-index: 11;
         }
 
         .log-header {
@@ -351,9 +352,7 @@
     </header>
 
     <div class="main-container">
-        <!-- 왼쪽 컨트롤러 -->
         <div class="control-panel">
-            
             <div class="panel-section">
                 <h2>📊 실시간 학습 상태</h2>
                 <div class="stat-grid">
@@ -403,20 +402,16 @@
             </div>
         </div>
 
-        <!-- 중앙 시각화 및 우측 레이아웃 통합 효과 -->
         <div class="content-area">
-            <!-- 현재 상태 인디케이터 -->
             <div class="status-banner">
                 <div class="status-dot" id="status-indicator-dot"></div>
                 <div class="status-text" id="status-indicator-text">대기 중 (단계별 이동이나 자동 학습을 시작하세요)</div>
             </div>
 
-            <!-- 메인 그래픽 캔버스 -->
             <div class="canvas-container" id="canvas-wrapper">
                 <canvas id="networkCanvas"></canvas>
             </div>
 
-            <!-- 데이터셋 미니 테이블 테이블 오버레이 -->
             <div class="dataset-overlay">
                 <strong>XOR 학습 데이터셋</strong>
                 <table class="dataset-table">
@@ -432,7 +427,6 @@
                 </table>
             </div>
 
-            <!-- 하단 수학 수식 로그 패널 -->
             <div class="log-panel">
                 <div class="log-header">
                     <span>수학적 연산 및 실시간 파라미터 업데이트 로그</span>
@@ -460,42 +454,34 @@
         let lr = 0.5;
         let currentLoss = 0.0;
         
-        // 상태 구성: 'FORWARD_1', 'FORWARD_2', 'LOSS', 'BACKWARD_OUTPUT', 'BACKWARD_HIDDEN', 'UPDATE'
         const STATES = ['IDLE', 'FORWARD_1', 'FORWARD_2', 'LOSS', 'BACKWARD_OUTPUT', 'BACKWARD_HIDDEN'];
         let currentStateIdx = 0;
         let isAutoPlaying = false;
-        let animationSpeed = 2; // 1: 느림, 2: 보통, 3: 빠름
+        let animationSpeed = 2;
 
-        // 가중치 및 바이어스 초기화 (XOR 공간 분리를 위한 무작위 초기화 후 대칭 붕괴 방지)
         let network = {
-            // 입력층(2개 노드) -> 은닉층(3개 노드)
             w1: [
-                [0.4, -0.2, 0.5], // x1에서 h1, h2, h3로 가는 가중치
-                [-0.3, 0.6, -0.1] // x2에서 h1, h2, h3로 가는 가중치
+                [0.4, -0.2, 0.5],
+                [-0.3, 0.6, -0.1]
             ],
-            b1: [0.1, -0.2, 0.1], // 은닉층 바이어스
+            b1: [0.1, -0.2, 0.1],
             
-            // 은닉층(3개 노드) -> 출력층(1개 노드)
-            w2: [[0.5], [-0.6], [0.3]], // h1, h2, h3에서 출력층으로 가는 가중치
-            b2: [-0.1], // 출력층 바이어스
+            w2: [[0.5], [-0.6], [0.3]],
+            b2: [-0.1],
 
-            // 각 노드의 활성화 값 및 캐시 데이터
             inputs: [0, 0],
             h_net: [0, 0, 0],
             h_out: [0, 0, 0],
             o_net: [0],
             o_out: [0],
 
-            // 오차 역전파용 그래디언트 캐시
             delta_o: [0],
             delta_h: [0, 0, 0]
         };
 
-        // 활성화 함수: 시그모이드
         function sigmoid(x) {
             return 1 / (1 + Math.exp(-x));
         }
-        // 시그모이드 미분
         function sigmoidDerivative(a) {
             return a * (1 - a);
         }
@@ -518,33 +504,29 @@
             const w = canvas.width;
             const h = canvas.height;
 
-            // 레이어별 X 좌표 할당
             const xInput = w * 0.2;
             const xHidden = w * 0.5;
             const xOutput = w * 0.8;
 
-            // 입력 노드 배치 (2개)
+            // 노드 반지름 크기를 24에서 48로 2배 확대 및 상하 균등 여백 재배치
             nodes.inputs = [
-                { x: xInput, y: h * 0.38, radius: 24, label: 'X1' },
-                { x: xInput, y: h * 0.62, radius: 24, label: 'X2' }
+                { x: xInput, y: h * 0.33, radius: 48, label: 'X1' },
+                { x: xInput, y: h * 0.67, radius: 48, label: 'X2' }
             ];
 
-            // 은닉 노드 배치 (3개)
             nodes.hidden = [
-                { x: xHidden, y: h * 0.25, radius: 24, label: 'H1' },
-                { x: xHidden, y: h * 0.50, radius: 24, label: 'H2' },
-                { x: xHidden, y: h * 0.75, radius: 24, label: 'H3' }
+                { x: xHidden, y: h * 0.22, radius: 48, label: 'H1' },
+                { x: xHidden, y: h * 0.50, radius: 48, label: 'H2' },
+                { x: xHidden, y: h * 0.78, radius: 48, label: 'H3' }
             ];
 
-            // 출력 노드 배치 (1개)
             nodes.output = [
-                { x: xOutput, y: h * 0.50, radius: 24, label: 'Out' }
+                { x: xOutput, y: h * 0.50, radius: 48, label: 'Out' }
             ];
         }
 
         window.addEventListener('resize', resizeCanvas);
 
-        // --- 로그 출력 유틸리티 ---
         const logBox = document.getElementById('log-box');
         const logStepBadge = document.getElementById('log-step-badge');
 
@@ -560,7 +542,6 @@
             logBox.innerHTML = '';
         }
 
-        // --- 애니메이션 파티클 생성 시스템 ---
         function createLayerParticles(fromLayer, toLayer, color, direction = 'forward') {
             particles = [];
             let speedMap = { 1: 0.008, 2: 0.02, 3: 0.05 };
@@ -580,7 +561,6 @@
             });
         }
 
-        // --- 핵심 러닝 알고리즘 단계별 상태 제어 로직 ---
         function nextStep() {
             if (epoch >= maxEpoch) {
                 addLog('✨ 설정된 최대 에포크 학습 완료!', 'success');
@@ -591,18 +571,15 @@
             const sample = dataset[currentSampleIdx];
             network.inputs = sample.inputs;
 
-            // 행 하이라이트 변경
             for(let i=0; i<4; i++) {
                 document.getElementById(`data-row-${i}`).className = (i === currentSampleIdx) ? 'active-row' : '';
             }
 
             if (currentStateIdx === 0 || STATES[currentStateIdx] === 'IDLE') {
-                // [순전파 1단계] 입력층 -> 은닉층 이동 시작
                 currentStateIdx = 1;
                 logStepBadge.innerText = "FORWARD (1/2)";
                 logStepBadge.style.backgroundColor = "rgba(59, 130, 246, 0.3)";
                 
-                // 은닉층 입력 가중치 합 계산
                 for (let j = 0; j < 3; j++) {
                     network.h_net[j] = network.inputs[0] * network.w1[0][j] + network.inputs[1] * network.w1[1][j] + network.b1[j];
                     network.h_out[j] = sigmoid(network.h_net[j]);
@@ -616,11 +593,9 @@
                 updateStatusBanner('순전파 단계: 데이터가 입력층에서 은닉층 가중치를 지나 이동 중입니다.', 'forward');
 
             } else if (STATES[currentStateIdx] === 'FORWARD_1') {
-                // [순전파 2단계] 은닉층 -> 출력층 이동 시작
                 currentStateIdx = 2;
                 logStepBadge.innerText = "FORWARD (2/2)";
                 
-                // 출력층 가중치 합 계산
                 network.o_net[0] = network.h_out[0] * network.w2[0][0] + network.h_out[1] * network.w2[1][0] + network.h_out[2] * network.w2[2][0] + network.b2[0];
                 network.o_out[0] = sigmoid(network.o_net[0]);
 
@@ -632,12 +607,10 @@
                 updateStatusBanner('순전파 단계: 은닉층 연산 결과가 최종 출력 노드로 전달됩니다.', 'forward');
 
             } else if (STATES[currentStateIdx] === 'FORWARD_2') {
-                // [오차 계산 단계]
                 currentStateIdx = 3;
                 logStepBadge.innerText = "LOSS CALCULATION";
                 logStepBadge.style.backgroundColor = "rgba(245, 158, 11, 0.3)";
 
-                // 손실 함수 연산 (Mean Squared Error 성분)
                 const error = 0.5 * Math.pow(sample.target - network.o_out[0], 2);
                 currentLoss = error;
                 document.getElementById('loss-display').innerText = currentLoss.toFixed(5);
@@ -646,16 +619,14 @@
                 addLog(`손실함수(MSE): <span class="math-expr">Loss = 0.5 · (Target - Out)^2</span>`, 'warning');
                 addLog(`계산된 개별 오차값: <strong style="color: var(--accent-amber);">${currentLoss.toFixed(5)}</strong>`, 'warning');
                 
-                particles = []; // 애니메이션 정지 상태에서 시각적 강조
+                particles = [];
                 updateStatusBanner('오차 계산 단계: 실제 정답과 예측값을 대조해 손실(Loss)을 구합니다.', 'loss');
 
             } else if (STATES[currentStateIdx] === 'LOSS') {
-                // [역전파 1단계] 출력층 오차 기울기 역전파
                 currentStateIdx = 4;
                 logStepBadge.innerText = "BACKPROPAGATION (1/2)";
                 logStepBadge.style.backgroundColor = "rgba(236, 72, 153, 0.3)";
 
-                // 출력층 그래디언트 계산: (o_out - target) * o_out * (1 - o_out)
                 network.delta_o[0] = (network.o_out[0] - sample.target) * sigmoidDerivative(network.o_out[0]);
 
                 addLog(`[역전파 1단계] 출력층 미분을 통해 출력 가중치의 수정 방향(Gradient)을 계산합니다.`, 'danger');
@@ -665,11 +636,9 @@
                 updateStatusBanner('역전파 단계: 출력 오차 미분값이 체인 룰(Chain Rule)에 따라 은닉층으로 거꾸로 전달됩니다.', 'backward');
 
             } else if (STATES[currentStateIdx] === 'BACKWARD_OUTPUT') {
-                // [역전파 2단계] 은닉층 오차 기울기 역전파
                 currentStateIdx = 5;
                 logStepBadge.innerText = "BACKPROPAGATION (2/2)";
 
-                // 은닉층 그래디언트 계산
                 for (let j = 0; j < 3; j++) {
                     let error_sum = network.delta_o[0] * network.w2[j][0];
                     network.delta_h[j] = error_sum * sigmoidDerivative(network.h_out[j]);
@@ -682,17 +651,13 @@
                 updateStatusBanner('역전파 단계: 미분 전파가 은닉층을 지나 입력 연산부까지 전달되며 오차를 나눕니다.', 'backward');
 
             } else if (STATES[currentStateIdx] === 'BACKWARD_HIDDEN') {
-                // [가중치 업데이트 및 샘플 변경 단계]
-                currentStateIdx = 0; // 초기 상태로 순환
+                currentStateIdx = 0;
                 
-                // 가중치 업데이트 연산 반영 (W = W - lr * delta * input)
-                // 은닉 -> 출력 가중치 업데이트
                 for (let j = 0; j < 3; j++) {
                     network.w2[j][0] -= lr * network.delta_o[0] * network.h_out[j];
                 }
                 network.b2[0] -= lr * network.delta_o[0];
 
-                // 입력 -> 은닉 가중치 업데이트
                 for (let i = 0; i < 2; i++) {
                     for (let j = 0; j < 3; j++) {
                         network.w1[i][j] -= lr * network.delta_h[j] * network.inputs[i];
@@ -706,7 +671,6 @@
                 addLog(`업데이트 공식: <span class="math-expr">W_new = W_old - 학습률(η) · δ · Input</span>`, 'success');
                 addLog(`가중치가 조정되어 다음 학습 시 오차가 감소하게 됩니다.`, 'success');
 
-                // 데이터셋 인덱스 토글 및 에포크 카운트 조절
                 currentSampleIdx++;
                 if (currentSampleIdx >= dataset.length) {
                     currentSampleIdx = 0;
@@ -726,11 +690,9 @@
             txt.innerText = text;
         }
 
-        // --- 캔버스 렌더링 루프 (모든 노드와 선 그리기) ---
         function drawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. 가중치 연결선 그리기 (입력 -> 은닉)
             nodes.inputs.forEach((inputNode, i) => {
                 nodes.hidden.forEach((hiddenNode, j) => {
                     const weight = network.w1[i][j];
@@ -738,7 +700,6 @@
                 });
             });
 
-            // 2. 가중치 연결선 그리기 (은닉 -> 출력)
             nodes.hidden.forEach((hiddenNode, j) => {
                 nodes.output.forEach((outputNode, k) => {
                     const weight = network.w2[j][k];
@@ -746,7 +707,6 @@
                 });
             });
 
-            // 3. 이동 중인 파티클 그리기
             particles.forEach(p => {
                 p.progress += p.speed;
                 if (p.progress > 1) p.progress = 1;
@@ -755,15 +715,15 @@
                 const currentY = p.fromY + (p.toY - p.fromY) * p.progress;
 
                 ctx.beginPath();
-                ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
+                ctx.arc(currentX, currentY, 8, 0, Math.PI * 2); // 파티클 크기도 미세 조절 (6->8)
                 ctx.fillStyle = p.color;
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = p.color;
                 ctx.fill();
-                ctx.shadowBlur = 0; // 섀도우 초기화
+                ctx.shadowBlur = 0;
             });
 
-            // 4. 노드 렌더링
+            // 각 노드를 출력하면서 결과 폰트 적용
             nodes.inputs.forEach((node, i) => drawNode(node, network.inputs[i].toFixed(1), 'var(--accent-blue)'));
             nodes.hidden.forEach((node, j) => drawNode(node, network.h_out[j].toFixed(2), '#64748b'));
             nodes.output.forEach((node, k) => drawNode(node, network.o_out[k].toFixed(3), 'var(--accent-amber)'));
@@ -776,44 +736,43 @@
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
             
-            // 가중치 크기에 따라 굵기 설정 및 양수/음수에 따른 색상 매핑
             const absWeight = Math.abs(weight);
             ctx.lineWidth = Math.min(Math.max(absWeight * 3, 1), 6);
             ctx.strokeStyle = weight >= 0 ? `rgba(96, 165, 250, ${0.2 + absWeight*0.5})` : `rgba(244, 114, 182, ${0.2 + absWeight*0.5})`;
             ctx.stroke();
 
-            // 가중치 값 텍스트 표기
-            ctx.font = '10px Courier New';
+            // 가중치 폰트 크기 대략 2배 확대 (10px -> 18px)
+            ctx.font = '18px Courier New';
             ctx.fillStyle = varColor('--text-muted');
-            ctx.fillText(weight.toFixed(2), (x1 + x2) / 2, (y1 + y2) / 2 - 5);
+            ctx.fillText(weight.toFixed(2), (x1 + x2) / 2, (y1 + y2) / 2 - 8);
         }
 
         function drawNode(node, valText, accentColor) {
-            // 외곽 빛나는 효과 (현재 상태에 맞게 활성화된 레이어만)
             ctx.beginPath();
             ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
             ctx.fillStyle = 'var(--panel-bg)';
             ctx.strokeStyle = accentColor;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 5; // 두께감도 미세 확장
             ctx.fill();
             ctx.stroke();
 
-            // 노드 이름 및 변수 상태값 출력
-            ctx.font = 'bold 11px Pretendard';
-            ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
-            ctx.fillText(node.label, node.x, node.y - 4);
+            
+            // 노드 ID 텍스트 크기 2배 확대 (11px -> 22px)
+            ctx.font = 'bold 22px Pretendard';
+            ctx.fillStyle = 'white';
+            ctx.fillText(node.label, node.x, node.y - 8);
 
-            ctx.font = '10px monospace';
+            // 노드 내부 변수값 텍스트 크기 2배 확대 (10px -> 20px)
+            ctx.font = '20px monospace';
             ctx.fillStyle = varColor('--text-muted');
-            ctx.fillText(valText, node.x, node.y + 10);
+            ctx.fillText(valText, node.x, node.y + 16);
         }
 
         function varColor(varName) {
             return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
         }
 
-        // --- 자동 실행용 타이머 시스템 루프 ---
         let autoPlayInterval = null;
 
         function startAutoPlay() {
@@ -837,7 +796,6 @@
             clearInterval(autoPlayInterval);
         }
 
-        // --- 컨트롤러 인터페이스 이벤트 바인딩 ---
         document.getElementById('btn-step').addEventListener('click', () => {
             stopAutoPlay();
             nextStep();
@@ -865,7 +823,6 @@
             updateStatusBanner('대기 중 (단계별 이동이나 자동 학습을 시작하세요)', 'info');
         });
 
-        // 슬라이더 변경 감지 이벤트
         document.getElementById('max-epoch-slider').addEventListener('input', (e) => {
             maxEpoch = parseInt(e.target.value);
             document.getElementById('max-epoch-val').innerText = maxEpoch;
@@ -882,14 +839,12 @@
             const textMap = { 1: "느림", 2: "보통", 3: "빠름" };
             document.getElementById('speed-val').innerText = textMap[animationSpeed];
             
-            // 자동 재생 중이면 주기를 갱신하기 위해 재시작 처리
             if (isAutoPlaying) {
                 stopAutoPlay();
                 startAutoPlay();
             }
         });
 
-        // 초기 시작 스크립트 실행
         resizeCanvas();
         requestAnimationFrame(drawNetwork);
     </script>
