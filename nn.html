@@ -66,16 +66,8 @@
             transition: all 0.2s;
         }
 
-        .github-badge:hover {
-            background-color: var(--border-color);
-            color: var(--text-main);
-        }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        .github-badge:hover { background-color: var(--border-color); color: var(--text-main); }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
 
         /* 왼쪽 컨트롤 패널 */
         .control-panel {
@@ -104,37 +96,12 @@
             letter-spacing: 0.05em;
         }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
+        .control-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        label { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .label-val { color: var(--accent-blue); font-weight: 600; }
+        input[type="range"] { width: 100%; accent-color: var(--accent-blue); cursor: pointer; }
 
-        label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .label-val {
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent-blue);
-            cursor: pointer;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn {
             background-color: #334155;
             color: white;
@@ -150,18 +117,12 @@
             gap: 6px;
             transition: all 0.2s;
         }
-
         .btn:hover:not(:disabled) { background-color: #475569; }
         .btn-primary { background-color: var(--accent-blue); }
         .btn-success { background-color: var(--accent-green); }
         .btn-danger { background-color: var(--accent-pink); }
 
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-box {
             background: rgba(15, 23, 42, 0.6);
             padding: 10px;
@@ -169,7 +130,6 @@
             border: 1px solid var(--border-color);
             text-align: center;
         }
-
         .stat-lbl { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
         .stat-val { font-size: 1.1rem; font-weight: 700; font-family: monospace; }
 
@@ -182,20 +142,8 @@
             position: relative;
         }
 
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            min-height: 300px;
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+        .canvas-container { flex: 1; position: relative; min-height: 300px; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
 
         .status-banner {
             position: absolute;
@@ -212,7 +160,6 @@
             z-index: 10;
             pointer-events: none;
         }
-
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--text-muted); }
         .status-dot.forward { background-color: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
         .status-dot.loss { background-color: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber); }
@@ -231,7 +178,6 @@
             font-size: 0.8rem;
             z-index: 10;
         }
-
         .dataset-table { border-collapse: collapse; margin-top: 6px; }
         .dataset-table th, .dataset-table td { padding: 4px 8px; text-align: center; border: 1px solid var(--border-color); }
         .dataset-table tr.active-row { background-color: rgba(59, 130, 246, 0.25); border: 1px solid var(--accent-blue); }
@@ -245,13 +191,7 @@
             z-index: 11;
         }
 
-        .log-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid var(--border-color);
-        }
-
+        .log-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); }
         .log-header {
             background-color: rgba(15, 23, 42, 0.5);
             padding: 8px 20px;
@@ -262,7 +202,6 @@
             display: flex;
             justify-content: space-between;
         }
-
         .log-content {
             flex: 1;
             padding: 15px 20px;
@@ -272,7 +211,6 @@
             line-height: 1.6;
             color: #cbd5e1;
         }
-
         .log-entry { margin-bottom: 6px; border-left: 3px solid #475569; padding-left: 10px; }
         .log-entry.info { border-color: var(--accent-blue); }
         .log-entry.success { border-color: var(--accent-green); }
@@ -281,12 +219,7 @@
         .math-expr { color: #60a5fa; background: rgba(30, 41, 59, 0.6); padding: 2px 6px; border-radius: 4px; }
 
         /* 결정경계 공간 그래프 영역 */
-        .graph-panel {
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            background-color: rgba(15, 23, 42, 0.3);
-        }
+        .graph-panel { width: 280px; display: flex; flex-direction: column; background-color: rgba(15, 23, 42, 0.3); }
         .graph-header {
             background-color: rgba(15, 23, 42, 0.5);
             padding: 8px 12px;
@@ -296,18 +229,8 @@
             border-bottom: 1px solid var(--border-color);
             text-align: center;
         }
-        .graph-body {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-        }
-        #graphCanvas {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-        }
+        .graph-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 5px; }
+        #graphCanvas { background-color: #0f172a; border: 1px solid var(--border-color); border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -404,9 +327,9 @@
                     </div>
                 </div>
                 <div class="graph-panel">
-                    <div class="graph-header">X1-X2 공간 실시간 직선 경계 분리</div>
+                    <div class="graph-header">X1-X2 공간 실시간 영역 구분 및 결정경계</div>
                     <div class="graph-body">
-                        <canvas id="graphCanvas" width="170" height="170"></canvas>
+                        <canvas id="graphCanvas" width="180" height="180"></canvas>
                     </div>
                 </div>
             </div>
@@ -438,16 +361,13 @@
                 [-0.4, 0.8, -0.2]
             ],
             b1: [0.1, -0.3, 0.2],
-            
             w2: [[0.6], [-0.7], [0.4]],
             b2: [-0.2],
-
             inputs: [0, 0],
             h_net: [0, 0, 0],
             h_out: [0, 0, 0],
             o_net: [0],
             o_out: [0],
-
             delta_o: [0],
             delta_h: [0, 0, 0]
         };
@@ -526,6 +446,17 @@
             });
         }
 
+        // 특정 X1, X2 입력에 대한 전체 네트워크 예측 피드포워드 연산 유틸리티 (배경 드로잉용)
+        function forwardNetworkPredict(x1, x2) {
+            let h_out = [];
+            for (let j = 0; j < 3; j++) {
+                let h_net = x1 * network.w1[0][j] + x2 * network.w1[1][j] + network.b1[j];
+                h_out.push(sigmoid(h_net));
+            }
+            let o_net = h_out[0] * network.w2[0][0] + h_out[1] * network.w2[1][0] + h_out[2] * network.w2[2][0] + network.b2[0];
+            return sigmoid(o_net);
+        }
+
         function nextStep() {
             if (epoch >= maxEpoch) {
                 addLog('✨ 설정된 최대 에포크 학습 완료!', 'success');
@@ -550,7 +481,7 @@
                     network.h_out[j] = sigmoid(network.h_net[j]);
                 }
 
-                addLog(`[순전파 1단계] 샘플 #${currentSampleIdx+1} 입력값 [${network.inputs.join(', ')}]이 은닉층으로 전달됩니다.`, 'info');
+                addLog(`[순전파 1단계] 샘플 #${currentSampleIdx+1} 입력값 [${network.inputs.join(', ')}]이 전달됩니다.`, 'info');
                 createLayerParticles(nodes.inputs, nodes.hidden, 'var(--accent-blue)', 'forward');
                 updateStatusBanner('순전파 단계: 데이터가 입력층에서 은닉층 가중치를 지나 이동 중입니다.', 'forward');
 
@@ -640,15 +571,12 @@
             txt.innerText = text;
         }
 
-        // --- 메인 그래픽 루프 ---
         function drawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 가중치선 그리기 (인덱스별로 출력 위치 다르게 계산하여 절대 안 겹치게 분산 배치)
             nodes.inputs.forEach((inputNode, i) => {
                 nodes.hidden.forEach((hiddenNode, j) => {
                     const weight = network.w1[i][j];
-                    // 가중치 텍스트 표시 지점 분산 비율 계산 (예: 0.23, 0.3, 0.37 등 다르게 지정)
                     let textRatio = 0.22 + (j * 0.07) + (i * 0.04);
                     drawConnection(inputNode.x, inputNode.y, hiddenNode.x, hiddenNode.y, weight, textRatio);
                 });
@@ -657,12 +585,11 @@
             nodes.hidden.forEach((hiddenNode, j) => {
                 nodes.output.forEach((outputNode, k) => {
                     const weight = network.w2[j][k];
-                    let textRatio = 0.35 + (j * 0.12); // 은닉-출력선도 수치 고유 위치 할당
+                    let textRatio = 0.35 + (j * 0.12);
                     drawConnection(hiddenNode.x, hiddenNode.y, outputNode.x, outputNode.y, weight, textRatio);
                 });
             });
 
-            // 이동 중인 파티클 그리기
             particles.forEach(p => {
                 p.progress += p.speed;
                 if (p.progress > 1) p.progress = 1;
@@ -678,18 +605,16 @@
                 ctx.shadowBlur = 0;
             });
 
-            // 노드 렌더링 (크기 2배 및 폰트 크기 2배 반영 유지)
             nodes.inputs.forEach((node, i) => drawNode(node, network.inputs[i].toFixed(1), 'var(--accent-blue)'));
             nodes.hidden.forEach((node, j) => drawNode(node, network.h_out[j].toFixed(2), '#64748b'));
             nodes.output.forEach((node, k) => drawNode(node, network.o_out[k].toFixed(3), 'var(--accent-amber)'));
 
-            // 우측 하단 결정 경계 그래프 동시 드로잉
+            // 공간 분할 좌표 그래프 드로잉
             drawSpaceGraph();
 
             requestAnimationFrame(drawNetwork);
         }
 
-        // 특정 비율(ratio) 위치에 가중치를 출력하여 겹침 차단하는 구조
         function drawConnection(x1, y1, x2, y2, weight, ratio) {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
@@ -700,7 +625,6 @@
             ctx.strokeStyle = weight >= 0 ? `rgba(96, 165, 250, ${0.2 + absWeight*0.5})` : `rgba(244, 114, 182, ${0.2 + absWeight*0.5})`;
             ctx.stroke();
 
-            // 계산된 고유 좌표에 18px 크기로 텍스트 렌더링
             ctx.font = '18px Courier New';
             ctx.fillStyle = varColor('--text-muted');
             let textX = x1 + (x2 - x1) * ratio;
@@ -727,18 +651,40 @@
             ctx.fillText(valText, node.x, node.y + 16);
         }
 
-        // --- 결정 경계 공간 (직선 분리) 그래프 시각화 함수 ---
+        // --- 결정 경계 및 4개 좌표 실시간 공간 분할 그리기 함수 ---
         function drawSpaceGraph() {
             const w = graphCanvas.width;
             const h = graphCanvas.height;
             gCtx.clearRect(0, 0, w, h);
 
-            // 여백용 패딩 설정
-            const p = 25;
+            const p = 25; // 그래프 안쪽 패딩
             const gW = w - 2 * p;
             const gH = h - 2 * p;
 
-            // 1. 축 그리기
+            // [추가 기능] 1. 배경을 작은 해상도의 격자 조각으로 돌면서 실시간 예측 값 영역 칠하기 (0=핑크, 1=블루)
+            const gridSize = 4; // 연산 성능 최적화 사이즈
+            for (let x = p; x < w - p; x += gridSize) {
+                for (let y = p; y < h - p; y += gridSize) {
+                    // 스크린 픽셀 좌표 -> 신경망 입력 값(0.0 ~ 1.0) 역투영 변환
+                    let inputX1 = (x - p) / gW;
+                    let inputX2 = (h - p - y) / gH;
+
+                    // 현재 가중치 상태로 해당 위치의 클래스 확률값 계산
+                    let pred = forwardNetworkPredict(inputX1, inputX2);
+                    
+                    // 값에 따라 알파값을 주어 부드럽게 배경색 혼합
+                    if (pred >= 0.5) {
+                        let alpha = (pred - 0.5) * 0.5; // 블루 영역 가중치
+                        gCtx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
+                    } else {
+                        let alpha = (0.5 - pred) * 0.5; // 핑크 영역 가중치
+                        gCtx.fillStyle = `rgba(236, 72, 153, ${alpha})`;
+                    }
+                    gCtx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+
+            // 2. 기본 축 드로잉
             gCtx.strokeStyle = '#334155';
             gCtx.lineWidth = 1;
             gCtx.beginPath();
@@ -746,16 +692,14 @@
             gCtx.moveTo(p, p); gCtx.lineTo(p, h - p);
             gCtx.stroke();
 
-            // 축 라벨
             gCtx.fillStyle = '#64748b';
-            gCtx.font = '9px monospace';
-            gCtx.fillText("0", p - 8, h - p + 8);
-            gCtx.fillText("1", w - p, h - p + 12);
-            gCtx.fillText("1", p - 10, p + 5);
+            gCtx.font = '10px monospace';
+            gCtx.fillText("0", p - 10, h - p + 12);
+            gCtx.fillText("X1", w - p + 5, h - p + 4);
+            gCtx.fillText("X2", p - 6, p - 6);
 
-            // 2. 은닉층 뉴런 3개가 구성하는 선형 방정식(직선) 실시간 가시화
-            // 공식: w1*x1 + w2*x2 + b = 0  =>  x2 = (-w1*x1 - b) / w2
-            const colors = ['#3b82f6', '#ec4899', '#10b981']; // H1, H2, H3 고유색상
+            // 3. 은닉층 뉴런 3개의 선형 분리선(직선) 그리기
+            const colors = ['#3b82f6', '#ec4899', '#10b981'];
             for (let j = 0; j < 3; j++) {
                 let w1 = network.w1[0][j];
                 let w2 = network.w1[1][j];
@@ -766,20 +710,15 @@
                 gCtx.beginPath();
 
                 let first = true;
-                // X1 좌표축을 따라 움직이며 매핑 직선 계산
-                for (let xVal = 0; xVal <= 1.0; xVal += 0.1) {
+                for (let xVal = 0; xVal <= 1.0; xVal += 0.05) {
                     let yVal = 0;
                     if (Math.abs(w2) > 0.0001) {
                         yVal = (-w1 * xVal - b) / w2;
-                    } else {
-                        yVal = 0;
-                    }
+                    } else { yVal = 0; }
 
-                    // 좌표 변환 (Canvas 스크린 공간으로 투영)
                     let scrX = p + xVal * gW;
                     let scrY = h - p - yVal * gH;
 
-                    // 그래프 내부 가두기 경계처리
                     if (scrY >= p && scrY <= h - p) {
                         if (first) { gCtx.moveTo(scrX, scrY); first = false; }
                         else { gCtx.lineTo(scrX, scrY); }
@@ -788,19 +727,24 @@
                 gCtx.stroke();
             }
 
-            // 3. 네 가지 XOR 샘플 데이터를 좌표에 점으로 표기
+            // 4. 4개의 원본 샘플 좌표 점 찍기
             dataset.forEach((d, idx) => {
                 let scrX = p + d.inputs[0] * gW;
                 let scrY = h - p - d.inputs[1] * gH;
 
                 gCtx.beginPath();
-                gCtx.arc(scrX, scrY, idx === currentSampleIdx ? 7 : 5, 0, Math.PI * 2);
+                gCtx.arc(scrX, scrY, idx === currentSampleIdx ? 8 : 5, 0, Math.PI * 2);
                 
-                // 타겟 정답에 따른 구별 (0은 분홍, 1은 파랑)
-                gCtx.fillStyle = d.target === 1 ? 'var(--accent-blue)' : 'var(--accent-pink)';
+                // 정답 데이터 1은 파랑, 0은 분홍
+                gCtx.fillStyle = d.target === 1 ? '#3b82f6' : '#ec4899';
+                gCtx.strokeStyle = '#ffffff';
+                
                 if (idx === currentSampleIdx) {
-                    gCtx.strokeStyle = '#ffffff';
-                    gCtx.lineWidth = 2;
+                    // 현재 학습에 투입된 점 외곽 하이라이트 활성화
+                    gCtx.lineWidth = 3;
+                    gCtx.stroke();
+                } else {
+                    gCtx.lineWidth = 1;
                     gCtx.stroke();
                 }
                 gCtx.fill();
