@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인공신경망 시각화 학습 도구 (순전파/역전파)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-pink: #ec4899;
+            --accent-amber: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header h1 span {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .github-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .github-badge:hover {
+            background-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 왼쪽 컨트롤 패널 */
+        .control-panel {
+            width: 340px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background-color: rgba(15, 23, 42, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-section h2 {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .label-val {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        input[type="number"] {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #475569;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary { background-color: var(--accent-blue); }
+        .btn-primary:hover:not(:disabled) { background-color: #2563eb; }
+        .btn-success { background-color: var(--accent-green); }
+        .btn-success:hover:not(:disabled) { background-color: #059669; }
+        .btn-danger { background-color: var(--accent-pink); }
+        .btn-danger:hover:not(:disabled) { background-color: #db2777; }
+
+        /* 대시보드 스탯 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        /* 메인 시각화 화면 영역 */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 상태 안내 오버레이 */
+        .status-banner {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+        }
+
+        .status-dot.forward { background-color: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
+        .status-dot.loss { background-color: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber); }
+        .status-dot.backward { background-color: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
+
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* 데이터셋 가이드 오버레이 */
+        .dataset-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        .dataset-table {
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        .dataset-table th, .dataset-table td {
+            padding: 4px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .dataset-table tr.active-row {
+            background-color: rgba(59, 130, 246, 0.25);
+            border: 1px solid var(--accent-blue);
+        }
+
+        /* 하단 수학 및 수식 로그 패널 */
+        .log-panel {
+            height: 220px;
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-header {
+            background-color: rgba(15, 23, 42, 0.5);
+            padding: 8px 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .log-content {
+            flex: 1;
+            padding: 15px 20px;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .log-entry {
+            margin-bottom: 6px;
+            border-left: 3px solid #475569;
+            padding-left: 10px;
+        }
+
+        .log-entry.info { border-color: var(--accent-blue); }
+        .log-entry.success { border-color: var(--accent-green); }
+        .log-entry.warning { border-color: var(--accent-amber); }
+        .log-entry.danger { border-color: var(--accent-pink); }
+
+        .math-expr {
+            color: #60a5fa;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧠 <span>NeuralFlow Visualizer</span></h1>
+        <a href="#" class="github-badge" target="_blank">📄 GitHub Pages 배포용 빌드</a>
+    </header>
+
+    <div class="main-container">
+        <!-- 왼쪽 컨트롤러 -->
+        <div class="control-panel">
+            
+            <div class="panel-section">
+                <h2>📊 실시간 학습 상태</h2>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-lbl">에포크 (Epoch)</div>
+                        <div class="stat-val" id="epoch-display">0 / 200</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">현재 손실 (Loss)</div>
+                        <div class="stat-val" id="loss-display" style="color: var(--accent-amber);">0.0000</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>⚙️ 하이퍼파라미터 설정</h2>
+                <div class="control-group">
+                    <label>최대 에포크 제한 <span class="label-val" id="max-epoch-val">200</span></label>
+                    <input type="range" id="max-epoch-slider" min="10" max="200" value="200" step="10">
+                </div>
+                <div class="control-group">
+                    <label>학습률 (Learning Rate) <span class="label-val" id="lr-val">0.5</span></label>
+                    <input type="range" id="lr-slider" min="0.05" max="1.0" value="0.5" step="0.05">
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>🕹️ 애니메이션 제어</h2>
+                <div class="control-group">
+                    <label>실행 속도 <span class="label-val" id="speed-val">보통</span></label>
+                    <input type="range" id="speed-slider" min="1" max="3" value="2" step="1">
+                </div>
+                <div class="control-group" style="margin-top: 10px;">
+                    <div class="btn-grid">
+                        <button class="btn btn-primary" id="btn-step">🐾 단계별 이동</button>
+                        <button class="btn btn-success" id="btn-auto">▶️ 자동 학습</button>
+                    </div>
+                    <button class="btn btn-danger" id="btn-reset" style="width: 100%; margin-top: 8px;">🔄 시뮬레이션 초기화</button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>🎯 데이터 가이드 (XOR 문제)</h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    입력값 2개가 서로 다를 때 1을 출력하고, 같을 때 0을 출력하는 비선형 분류 문제입니다. 2층 신경망 구조로 해결합니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 중앙 시각화 및 우측 레이아웃 통합 효과 -->
+        <div class="content-area">
+            <!-- 현재 상태 인디케이터 -->
+            <div class="status-banner">
+                <div class="status-dot" id="status-indicator-dot"></div>
+                <div class="status-text" id="status-indicator-text">대기 중 (단계별 이동이나 자동 학습을 시작하세요)</div>
+            </div>
+
+            <!-- 메인 그래픽 캔버스 -->
+            <div class="canvas-container" id="canvas-wrapper">
+                <canvas id="networkCanvas"></canvas>
+            </div>
+
+            <!-- 데이터셋 미니 테이블 테이블 오버레이 -->
+            <div class="dataset-overlay">
+                <strong>XOR 학습 데이터셋</strong>
+                <table class="dataset-table">
+                    <thead>
+                        <tr><th>샘플</th><th>X1</th><th>X2</th><th>실제값 (Y)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr id="data-row-0"><td>#1</td><td>0</td><td>0</td><td>0</td></tr>
+                        <tr id="data-row-1"><td>#2</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr id="data-row-2"><td>#3</td><td>1</td><td>0</td><td>1</td></tr>
+                        <tr id="data-row-3"><td>#4</td><td>1</td><td>1</td><td>0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 하단 수학 수식 로그 패널 -->
+            <div class="log-panel">
+                <div class="log-header">
+                    <span>수학적 연산 및 실시간 파라미터 업데이트 로그</span>
+                    <span id="log-step-badge">IDLE</span>
+                </div>
+                <div class="log-content" id="log-box">
+                    <div class="log-entry info">시뮬레이터가 준비되었습니다. '단계별 이동'을 눌러 순전파(Forward Propagation) 연산을 시작해보세요.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 인공신경망 데이터 및 상태 정의 ---
+        const dataset = [
+            { inputs: [0, 0], target: 0 },
+            { inputs: [0, 1], target: 1 },
+            { inputs: [1, 0], target: 1 },
+            { inputs: [1, 1], target: 0 }
+        ];
+
+        let currentSampleIdx = 0;
+        let epoch = 0;
+        let maxEpoch = 200;
+        let lr = 0.5;
+        let currentLoss = 0.0;
+        
+        // 상태 구성: 'FORWARD_1', 'FORWARD_2', 'LOSS', 'BACKWARD_OUTPUT', 'BACKWARD_HIDDEN', 'UPDATE'
+        const STATES = ['IDLE', 'FORWARD_1', 'FORWARD_2', 'LOSS', 'BACKWARD_OUTPUT', 'BACKWARD_HIDDEN'];
+        let currentStateIdx = 0;
+        let isAutoPlaying = false;
+        let animationSpeed = 2; // 1: 느림, 2: 보통, 3: 빠름
+
+        // 가중치 및 바이어스 초기화 (XOR 공간 분리를 위한 무작위 초기화 후 대칭 붕괴 방지)
+        let network = {
+            // 입력층(2개 노드) -> 은닉층(3개 노드)
+            w1: [
+                [0.4, -0.2, 0.5], // x1에서 h1, h2, h3로 가는 가중치
+                [-0.3, 0.6, -0.1] // x2에서 h1, h2, h3로 가는 가중치
+            ],
+            b1: [0.1, -0.2, 0.1], // 은닉층 바이어스
+            
+            // 은닉층(3개 노드) -> 출력층(1개 노드)
+            w2: [[0.5], [-0.6], [0.3]], // h1, h2, h3에서 출력층으로 가는 가중치
+            b2: [-0.1], // 출력층 바이어스
+
+            // 각 노드의 활성화 값 및 캐시 데이터
+            inputs: [0, 0],
+            h_net: [0, 0, 0],
+            h_out: [0, 0, 0],
+            o_net: [0],
+            o_out: [0],
+
+            // 오차 역전파용 그래디언트 캐시
+            delta_o: [0],
+            delta_h: [0, 0, 0]
+        };
+
+        // 활성화 함수: 시그모이드
+        function sigmoid(x) {
+            return 1 / (1 + Math.exp(-x));
+        }
+        // 시그모이드 미분
+        function sigmoidDerivative(a) {
+            return a * (1 - a);
+        }
+
+        // --- 캔버스 그래픽 및 레이아웃 설정 ---
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+
+        let nodes = { inputs: [], hidden: [], output: [] };
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+            setupNodePositions();
+        }
+
+        function setupNodePositions() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 레이어별 X 좌표 할당
+            const xInput = w * 0.2;
+            const xHidden = w * 0.5;
+            const xOutput = w * 0.8;
+
+            // 입력 노드 배치 (2개)
+            nodes.inputs = [
+                { x: xInput, y: h * 0.38, radius: 24, label: 'X1' },
+                { x: xInput, y: h * 0.62, radius: 24, label: 'X2' }
+            ];
+
+            // 은닉 노드 배치 (3개)
+            nodes.hidden = [
+                { x: xHidden, y: h * 0.25, radius: 24, label: 'H1' },
+                { x: xHidden, y: h * 0.50, radius: 24, label: 'H2' },
+                { x: xHidden, y: h * 0.75, radius: 24, label: 'H3' }
+            ];
+
+            // 출력 노드 배치 (1개)
+            nodes.output = [
+                { x: xOutput, y: h * 0.50, radius: 24, label: 'Out' }
+            ];
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- 로그 출력 유틸리티 ---
+        const logBox = document.getElementById('log-box');
+        const logStepBadge = document.getElementById('log-step-badge');
+
+        function addLog(text, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = text;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function clearLog() {
+            logBox.innerHTML = '';
+        }
+
+        // --- 애니메이션 파티클 생성 시스템 ---
+        function createLayerParticles(fromLayer, toLayer, color, direction = 'forward') {
+            particles = [];
+            let speedMap = { 1: 0.008, 2: 0.02, 3: 0.05 };
+            
+            fromLayer.forEach((fromNode, fromIdx) => {
+                toLayer.forEach((toNode, toIdx) => {
+                    particles.push({
+                        fromX: direction === 'forward' ? fromNode.x : toNode.x,
+                        fromY: direction === 'forward' ? fromNode.y : toNode.y,
+                        toX: direction === 'forward' ? toNode.x : fromNode.x,
+                        toY: direction === 'forward' ? toNode.y : fromNode.y,
+                        progress: 0,
+                        speed: speedMap[animationSpeed],
+                        color: color
+                    });
+                });
+            });
+        }
+
+        // --- 핵심 러닝 알고리즘 단계별 상태 제어 로직 ---
+        function nextStep() {
+            if (epoch >= maxEpoch) {
+                addLog('✨ 설정된 최대 에포크 학습 완료!', 'success');
+                stopAutoPlay();
+                return;
+            }
+
+            const sample = dataset[currentSampleIdx];
+            network.inputs = sample.inputs;
+
+            // 행 하이라이트 변경
+            for(let i=0; i<4; i++) {
+                document.getElementById(`data-row-${i}`).className = (i === currentSampleIdx) ? 'active-row' : '';
+            }
+
+            if (currentStateIdx === 0 || STATES[currentStateIdx] === 'IDLE') {
+                // [순전파 1단계] 입력층 -> 은닉층 이동 시작
+                currentStateIdx = 1;
+                logStepBadge.innerText = "FORWARD (1/2)";
+                logStepBadge.style.backgroundColor = "rgba(59, 130, 246, 0.3)";
+                
+                // 은닉층 입력 가중치 합 계산
+                for (let j = 0; j < 3; j++) {
+                    network.h_net[j] = network.inputs[0] * network.w1[0][j] + network.inputs[1] * network.w1[1][j] + network.b1[j];
+                    network.h_out[j] = sigmoid(network.h_net[j]);
+                }
+
+                addLog(`[순전파 1단계] 샘플 #${currentSampleIdx+1} 입력값 [${network.inputs.join(', ')}]이 은닉층으로 전달됩니다.`, 'info');
+                addLog(`연산 공식: <span class="math-expr">H_net = X1·W1 + X2·W1 + bias</span>`, 'info');
+                addLog(`은닉 활성화 결과값: H1=${network.h_out[0].toFixed(3)}, H2=${network.h_out[1].toFixed(3)}, H3=${network.h_out[2].toFixed(3)}`, 'info');
+                
+                createLayerParticles(nodes.inputs, nodes.hidden, 'var(--accent-blue)', 'forward');
+                updateStatusBanner('순전파 단계: 데이터가 입력층에서 은닉층 가중치를 지나 이동 중입니다.', 'forward');
+
+            } else if (STATES[currentStateIdx] === 'FORWARD_1') {
+                // [순전파 2단계] 은닉층 -> 출력층 이동 시작
+                currentStateIdx = 2;
+                logStepBadge.innerText = "FORWARD (2/2)";
+                
+                // 출력층 가중치 합 계산
+                network.o_net[0] = network.h_out[0] * network.w2[0][0] + network.h_out[1] * network.w2[1][0] + network.h_out[2] * network.w2[2][0] + network.b2[0];
+                network.o_out[0] = sigmoid(network.o_net[0]);
+
+                addLog(`[순전파 2단계] 활성화된 은닉 노드 정보가 출력층으로 전달됩니다.`, 'info');
+                addLog(`출력 노드 연산: <span class="math-expr">Out_net = ∑(H_out · W2) + b2</span> ➔ 시그모이드 통과`, 'info');
+                addLog(`예측 출력값(Out_out): <strong style="color: var(--accent-blue);">${network.o_out[0].toFixed(4)}</strong> (실제 목표값: ${sample.target})`, 'info');
+                
+                createLayerParticles(nodes.hidden, nodes.output, 'var(--accent-blue)', 'forward');
+                updateStatusBanner('순전파 단계: 은닉층 연산 결과가 최종 출력 노드로 전달됩니다.', 'forward');
+
+            } else if (STATES[currentStateIdx] === 'FORWARD_2') {
+                // [오차 계산 단계]
+                currentStateIdx = 3;
+                logStepBadge.innerText = "LOSS CALCULATION";
+                logStepBadge.style.backgroundColor = "rgba(245, 158, 11, 0.3)";
+
+                // 손실 함수 연산 (Mean Squared Error 성분)
+                const error = 0.5 * Math.pow(sample.target - network.o_out[0], 2);
+                currentLoss = error;
+                document.getElementById('loss-display').innerText = currentLoss.toFixed(5);
+
+                addLog(`[오차 계산] 출력값과 실제값 정답 데이터를 비교하여 손실을 측정합니다.`, 'warning');
+                addLog(`손실함수(MSE): <span class="math-expr">Loss = 0.5 · (Target - Out)^2</span>`, 'warning');
+                addLog(`계산된 개별 오차값: <strong style="color: var(--accent-amber);">${currentLoss.toFixed(5)}</strong>`, 'warning');
+                
+                particles = []; // 애니메이션 정지 상태에서 시각적 강조
+                updateStatusBanner('오차 계산 단계: 실제 정답과 예측값을 대조해 손실(Loss)을 구합니다.', 'loss');
+
+            } else if (STATES[currentStateIdx] === 'LOSS') {
+                // [역전파 1단계] 출력층 오차 기울기 역전파
+                currentStateIdx = 4;
+                logStepBadge.innerText = "BACKPROPAGATION (1/2)";
+                logStepBadge.style.backgroundColor = "rgba(236, 72, 153, 0.3)";
+
+                // 출력층 그래디언트 계산: (o_out - target) * o_out * (1 - o_out)
+                network.delta_o[0] = (network.o_out[0] - sample.target) * sigmoidDerivative(network.o_out[0]);
+
+                addLog(`[역전파 1단계] 출력층 미분을 통해 출력 가중치의 수정 방향(Gradient)을 계산합니다.`, 'danger');
+                addLog(`출력층 오차 기울기: <span class="math-expr">∂E/∂Out_net = (Out - Target) · Out·(1-Out)</span> = ${network.delta_o[0].toFixed(4)}`, 'danger');
+                
+                createLayerParticles(nodes.hidden, nodes.output, 'var(--accent-pink)', 'backward');
+                updateStatusBanner('역전파 단계: 출력 오차 미분값이 체인 룰(Chain Rule)에 따라 은닉층으로 거꾸로 전달됩니다.', 'backward');
+
+            } else if (STATES[currentStateIdx] === 'BACKWARD_OUTPUT') {
+                // [역전파 2단계] 은닉층 오차 기울기 역전파
+                currentStateIdx = 5;
+                logStepBadge.innerText = "BACKPROPAGATION (2/2)";
+
+                // 은닉층 그래디언트 계산
+                for (let j = 0; j < 3; j++) {
+                    let error_sum = network.delta_o[0] * network.w2[j][0];
+                    network.delta_h[j] = error_sum * sigmoidDerivative(network.h_out[j]);
+                }
+
+                addLog(`[역전파 2단계] 미분 연산이 은닉층으로 확장되어 이전 층의 가중치 조정을 준비합니다.`, 'danger');
+                addLog(`은닉층 H1 오차 기울기: <span class="math-expr">δ_h = δ_out · W2_1 · H1·(1-H1)</span> = ${network.delta_h[0].toFixed(4)}`, 'danger');
+                
+                createLayerParticles(nodes.inputs, nodes.hidden, 'var(--accent-pink)', 'backward');
+                updateStatusBanner('역전파 단계: 미분 전파가 은닉층을 지나 입력 연산부까지 전달되며 오차를 나눕니다.', 'backward');
+
+            } else if (STATES[currentStateIdx] === 'BACKWARD_HIDDEN') {
+                // [가중치 업데이트 및 샘플 변경 단계]
+                currentStateIdx = 0; // 초기 상태로 순환
+                
+                // 가중치 업데이트 연산 반영 (W = W - lr * delta * input)
+                // 은닉 -> 출력 가중치 업데이트
+                for (let j = 0; j < 3; j++) {
+                    network.w2[j][0] -= lr * network.delta_o[0] * network.h_out[j];
+                }
+                network.b2[0] -= lr * network.delta_o[0];
+
+                // 입력 -> 은닉 가중치 업데이트
+                for (let i = 0; i < 2; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        network.w1[i][j] -= lr * network.delta_h[j] * network.inputs[i];
+                    }
+                }
+                for (let j = 0; j < 3; j++) {
+                    network.b1[j] -= lr * network.delta_h[j];
+                }
+
+                addLog(`[파라미터 업데이트] 계산된 오차 미분값을 반영해 네트워크의 가중치를 조정합니다.`, 'success');
+                addLog(`업데이트 공식: <span class="math-expr">W_new = W_old - 학습률(η) · δ · Input</span>`, 'success');
+                addLog(`가중치가 조정되어 다음 학습 시 오차가 감소하게 됩니다.`, 'success');
+
+                // 데이터셋 인덱스 토글 및 에포크 카운트 조절
+                currentSampleIdx++;
+                if (currentSampleIdx >= dataset.length) {
+                    currentSampleIdx = 0;
+                    epoch++;
+                    document.getElementById('epoch-display').innerText = `${epoch} / ${maxEpoch}`;
+                }
+
+                particles = [];
+                updateStatusBanner('파라미터 업데이트 완료! 새로운 가중치가 네트워크 선 가중치 두께 및 수치로 반영됩니다.', 'info');
+            }
+        }
+
+        function updateStatusBanner(text, stateClass) {
+            const dot = document.getElementById('status-indicator-dot');
+            const txt = document.getElementById('status-indicator-text');
+            dot.className = `status-dot ${stateClass}`;
+            txt.innerText = text;
+        }
+
+        // --- 캔버스 렌더링 루프 (모든 노드와 선 그리기) ---
+        function drawNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. 가중치 연결선 그리기 (입력 -> 은닉)
+            nodes.inputs.forEach((inputNode, i) => {
+                nodes.hidden.forEach((hiddenNode, j) => {
+                    const weight = network.w1[i][j];
+                    drawConnection(inputNode.x, inputNode.y, hiddenNode.x, hiddenNode.y, weight);
+                });
+            });
+
+            // 2. 가중치 연결선 그리기 (은닉 -> 출력)
+            nodes.hidden.forEach((hiddenNode, j) => {
+                nodes.output.forEach((outputNode, k) => {
+                    const weight = network.w2[j][k];
+                    drawConnection(hiddenNode.x, hiddenNode.y, outputNode.x, outputNode.y, weight);
+                });
+            });
+
+            // 3. 이동 중인 파티클 그리기
+            particles.forEach(p => {
+                p.progress += p.speed;
+                if (p.progress > 1) p.progress = 1;
+
+                const currentX = p.fromX + (p.toX - p.fromX) * p.progress;
+                const currentY = p.fromY + (p.toY - p.fromY) * p.progress;
+
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // 섀도우 초기화
+            });
+
+            // 4. 노드 렌더링
+            nodes.inputs.forEach((node, i) => drawNode(node, network.inputs[i].toFixed(1), 'var(--accent-blue)'));
+            nodes.hidden.forEach((node, j) => drawNode(node, network.h_out[j].toFixed(2), '#64748b'));
+            nodes.output.forEach((node, k) => drawNode(node, network.o_out[k].toFixed(3), 'var(--accent-amber)'));
+
+            requestAnimationFrame(drawNetwork);
+        }
+
+        function drawConnection(x1, y1, x2, y2, weight) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            
+            // 가중치 크기에 따라 굵기 설정 및 양수/음수에 따른 색상 매핑
+            const absWeight = Math.abs(weight);
+            ctx.lineWidth = Math.min(Math.max(absWeight * 3, 1), 6);
+            ctx.strokeStyle = weight >= 0 ? `rgba(96, 165, 250, ${0.2 + absWeight*0.5})` : `rgba(244, 114, 182, ${0.2 + absWeight*0.5})`;
+            ctx.stroke();
+
+            // 가중치 값 텍스트 표기
+            ctx.font = '10px Courier New';
+            ctx.fillStyle = varColor('--text-muted');
+            ctx.fillText(weight.toFixed(2), (x1 + x2) / 2, (y1 + y2) / 2 - 5);
+        }
+
+        function drawNode(node, valText, accentColor) {
+            // 외곽 빛나는 효과 (현재 상태에 맞게 활성화된 레이어만)
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'var(--panel-bg)';
+            ctx.strokeStyle = accentColor;
+            ctx.lineWidth = 3;
+            ctx.fill();
+            ctx.stroke();
+
+            // 노드 이름 및 변수 상태값 출력
+            ctx.font = 'bold 11px Pretendard';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(node.label, node.x, node.y - 4);
+
+            ctx.font = '10px monospace';
+            ctx.fillStyle = varColor('--text-muted');
+            ctx.fillText(valText, node.x, node.y + 10);
+        }
+
+        function varColor(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // --- 자동 실행용 타이머 시스템 루프 ---
+        let autoPlayInterval = null;
+
+        function startAutoPlay() {
+            if (isAutoPlaying) return;
+            isAutoPlaying = true;
+            document.getElementById('btn-auto').innerText = "⏸️ 일시 정지";
+            document.getElementById('btn-auto').className = "btn btn-danger";
+            
+            let intervalTime = animationSpeed === 1 ? 2500 : animationSpeed === 2 ? 1200 : 400;
+
+            autoPlayInterval = setInterval(() => {
+                nextStep();
+            }, intervalTime);
+        }
+
+        function stopAutoPlay() {
+            if (!isAutoPlaying) return;
+            isAutoPlaying = false;
+            document.getElementById('btn-auto').innerText = "▶️ 자동 학습";
+            document.getElementById('btn-auto').className = "btn btn-success";
+            clearInterval(autoPlayInterval);
+        }
+
+        // --- 컨트롤러 인터페이스 이벤트 바인딩 ---
+        document.getElementById('btn-step').addEventListener('click', () => {
+            stopAutoPlay();
+            nextStep();
+        });
+
+        document.getElementById('btn-auto').addEventListener('click', () => {
+            if (isAutoPlaying) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            stopAutoPlay();
+            epoch = 0;
+            currentSampleIdx = 0;
+            currentStateIdx = 0;
+            currentLoss = 0.0;
+            document.getElementById('epoch-display').innerText = "0 / " + maxEpoch;
+            document.getElementById('loss-display').innerText = "0.0000";
+            particles = [];
+            clearLog();
+            addLog("🔄 시뮬레이션 인터페이스 및 신경망 가중치 상태가 초기화되었습니다.", "warning");
+            updateStatusBanner('대기 중 (단계별 이동이나 자동 학습을 시작하세요)', 'info');
+        });
+
+        // 슬라이더 변경 감지 이벤트
+        document.getElementById('max-epoch-slider').addEventListener('input', (e) => {
+            maxEpoch = parseInt(e.target.value);
+            document.getElementById('max-epoch-val').innerText = maxEpoch;
+            document.getElementById('epoch-display').innerText = `${epoch} / ${maxEpoch}`;
+        });
+
+        document.getElementById('lr-slider').addEventListener('input', (e) => {
+            lr = parseFloat(e.target.value);
+            document.getElementById('lr-val').innerText = lr;
+        });
+
+        document.getElementById('speed-slider').addEventListener('input', (e) => {
+            animationSpeed = parseInt(e.target.value);
+            const textMap = { 1: "느림", 2: "보통", 3: "빠름" };
+            document.getElementById('speed-val').innerText = textMap[animationSpeed];
+            
+            // 자동 재생 중이면 주기를 갱신하기 위해 재시작 처리
+            if (isAutoPlaying) {
+                stopAutoPlay();
+                startAutoPlay();
+            }
+        });
+
+        // 초기 시작 스크립트 실행
+        resizeCanvas();
+        requestAnimationFrame(drawNetwork);
+    </script>
+</body>
+</html>
