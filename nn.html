@@ -218,8 +218,8 @@
         .log-entry.danger { border-color: var(--accent-pink); }
         .math-expr { color: #60a5fa; background: rgba(30, 41, 59, 0.6); padding: 2px 6px; border-radius: 4px; }
 
-        /* 결정경계 공간 그래프 영역 */
-        .graph-panel { width: 280px; display: flex; flex-direction: column; background-color: rgba(15, 23, 42, 0.3); }
+        /* 결정경계 공간 그래프 영역 너비 소폭 확장 */
+        .graph-panel { width: 310px; display: flex; flex-direction: column; background-color: rgba(15, 23, 42, 0.3); }
         .graph-header {
             background-color: rgba(15, 23, 42, 0.5);
             padding: 8px 12px;
@@ -327,9 +327,9 @@
                     </div>
                 </div>
                 <div class="graph-panel">
-                    <div class="graph-header">X1-X2 공간 실시간 영역 구분 및 결정경계</div>
+                    <div class="graph-header">실시간 좌표별 정답(Y) vs 예측값(Out) 대조</div>
                     <div class="graph-body">
-                        <canvas id="graphCanvas" width="180" height="180"></canvas>
+                        <canvas id="graphCanvas" width="200" height="180"></canvas>
                     </div>
                 </div>
             </div>
@@ -446,7 +446,6 @@
             });
         }
 
-        // 특정 X1, X2 입력에 대한 전체 네트워크 예측 피드포워드 연산 유틸리티 (배경 드로잉용)
         function forwardNetworkPredict(x1, x2) {
             let h_out = [];
             for (let j = 0; j < 3; j++) {
@@ -609,7 +608,6 @@
             nodes.hidden.forEach((node, j) => drawNode(node, network.h_out[j].toFixed(2), '#64748b'));
             nodes.output.forEach((node, k) => drawNode(node, network.o_out[k].toFixed(3), 'var(--accent-amber)'));
 
-            // 공간 분할 좌표 그래프 드로잉
             drawSpaceGraph();
 
             requestAnimationFrame(drawNetwork);
@@ -651,40 +649,36 @@
             ctx.fillText(valText, node.x, node.y + 16);
         }
 
-        // --- 결정 경계 및 4개 좌표 실시간 공간 분할 그리기 함수 ---
         function drawSpaceGraph() {
             const w = graphCanvas.width;
             const h = graphCanvas.height;
             gCtx.clearRect(0, 0, w, h);
 
-            const p = 25; // 그래프 안쪽 패딩
+            const p = 35; // 라벨 가독성을 위해 상하좌우 패딩 소폭 확장
             const gW = w - 2 * p;
             const gH = h - 2 * p;
 
-            // [추가 기능] 1. 배경을 작은 해상도의 격자 조각으로 돌면서 실시간 예측 값 영역 칠하기 (0=핑크, 1=블루)
-            const gridSize = 4; // 연산 성능 최적화 사이즈
+            // 1. 격자 배경 스캔색 필터 드로잉
+            const gridSize = 4;
             for (let x = p; x < w - p; x += gridSize) {
                 for (let y = p; y < h - p; y += gridSize) {
-                    // 스크린 픽셀 좌표 -> 신경망 입력 값(0.0 ~ 1.0) 역투영 변환
                     let inputX1 = (x - p) / gW;
                     let inputX2 = (h - p - y) / gH;
 
-                    // 현재 가중치 상태로 해당 위치의 클래스 확률값 계산
                     let pred = forwardNetworkPredict(inputX1, inputX2);
                     
-                    // 값에 따라 알파값을 주어 부드럽게 배경색 혼합
                     if (pred >= 0.5) {
-                        let alpha = (pred - 0.5) * 0.5; // 블루 영역 가중치
+                        let alpha = (pred - 0.5) * 0.45;
                         gCtx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
                     } else {
-                        let alpha = (0.5 - pred) * 0.5; // 핑크 영역 가중치
+                        let alpha = (0.5 - pred) * 0.45;
                         gCtx.fillStyle = `rgba(236, 72, 153, ${alpha})`;
                     }
                     gCtx.fillRect(x, y, gridSize, gridSize);
                 }
             }
 
-            // 2. 기본 축 드로잉
+            // 2. 축 드로잉
             gCtx.strokeStyle = '#334155';
             gCtx.lineWidth = 1;
             gCtx.beginPath();
@@ -694,11 +688,11 @@
 
             gCtx.fillStyle = '#64748b';
             gCtx.font = '10px monospace';
-            gCtx.fillText("0", p - 10, h - p + 12);
+            gCtx.fillText("0", p - 12, h - p + 12);
             gCtx.fillText("X1", w - p + 5, h - p + 4);
-            gCtx.fillText("X2", p - 6, p - 6);
+            gCtx.fillText("X2", p - 6, p - 8);
 
-            // 3. 은닉층 뉴런 3개의 선형 분리선(직선) 그리기
+            // 3. 은닉층 뉴런 직선들 매핑
             const colors = ['#3b82f6', '#ec4899', '#10b981'];
             for (let j = 0; j < 3; j++) {
                 let w1 = network.w1[0][j];
@@ -706,7 +700,7 @@
                 let b = network.b1[j];
 
                 gCtx.strokeStyle = colors[j];
-                gCtx.lineWidth = 1.5;
+                gCtx.lineWidth = 1.2;
                 gCtx.beginPath();
 
                 let first = true;
@@ -727,27 +721,43 @@
                 gCtx.stroke();
             }
 
-            // 4. 4개의 원본 샘플 좌표 점 찍기
+            // 4. 4개 샘플 데이터 점 및 [실제값 vs 예측값] 실시간 문자 레이블 드로잉
             dataset.forEach((d, idx) => {
                 let scrX = p + d.inputs[0] * gW;
                 let scrY = h - p - d.inputs[1] * gH;
 
+                // 해당 좌표의 현재 실시간 모델 예측값 도출
+                let currentPredict = forwardNetworkPredict(d.inputs[0], d.inputs[1]);
+
                 gCtx.beginPath();
-                gCtx.arc(scrX, scrY, idx === currentSampleIdx ? 8 : 5, 0, Math.PI * 2);
+                gCtx.arc(scrX, scrY, idx === currentSampleIdx ? 7 : 4, 0, Math.PI * 2);
                 
-                // 정답 데이터 1은 파랑, 0은 분홍
                 gCtx.fillStyle = d.target === 1 ? '#3b82f6' : '#ec4899';
                 gCtx.strokeStyle = '#ffffff';
-                
-                if (idx === currentSampleIdx) {
-                    // 현재 학습에 투입된 점 외곽 하이라이트 활성화
-                    gCtx.lineWidth = 3;
-                    gCtx.stroke();
-                } else {
-                    gCtx.lineWidth = 1;
-                    gCtx.stroke();
-                }
+                gCtx.lineWidth = idx === currentSampleIdx ? 2.5 : 1;
+                gCtx.stroke();
                 gCtx.fill();
+
+                // [핵심 변경 및 보강] 좌표 글자 겹침 방지 오프셋 다각화 레이아웃 배치
+                gCtx.fillStyle = '#f8fafc';
+                gCtx.font = 'bold 9px monospace';
+                
+                let textText = `Y:${d.target} ➔ Out:${currentPredict.toFixed(2)}`;
+                
+                // 좌표 사분면 위치에 따라 글자가 그래프 박스 밖으로 탈출하거나 점끼리 뭉치지 않게 방향 분기 조절
+                let textX = scrX + 8;
+                let textY = scrY - 4;
+
+                if (d.inputs[0] === 1) { textX = scrX - 105; } // 우측 점들은 텍스트를 좌측으로 배치
+                if (d.inputs[1] === 1) { textY = scrY + 12; }  // 상단 점들은 텍스트를 아래로 내려 배치
+
+                // 텍스트 배경 반투명 상자 패딩처리로 시인성 극대화
+                gCtx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                gCtx.fillRect(textX - 3, textY - 9, 98, 12);
+
+                // 값 텍스트 최종 드로잉
+                gCtx.fillStyle = idx === currentSampleIdx ? '#f59e0b' : '#cbd5e1';
+                gCtx.fillText(textText, textX, textY);
             });
         }
 
